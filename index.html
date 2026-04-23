@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Premium</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Elements for Glassmorphism -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="glass-panel login-panel">
+            <div class="logo">
+                <i class="fa-regular fa-calendar-check"></i>
+            </div>
+            <h1>Bienvenido a tu Calendario</h1>
+            <p>Organiza tu tiempo, gestiona tus eventos.</p>
+            <button id="btn-login-google" class="btn-google">
+                <i class="fa-brands fa-google"></i> Iniciar sesión con Google
+            </button>
+        </div>
+    </div>
+
+    <!-- Pending Screen (Waiting for admin approval) -->
+    <div id="pending-screen" class="screen">
+        <div class="glass-panel login-panel">
+            <div class="logo" style="color: #f59e0b;">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <h1>Solicitud Enviada</h1>
+            <p>Tu solicitud para acceder al calendario está pendiente de aprobación por el Administrador.</p>
+            <p class="small-text">Por favor, vuelve a revisar más tarde.</p>
+            <button id="btn-logout-pending" class="btn-secondary" style="margin-top: 1rem;">
+                Cerrar Sesión
+            </button>
+        </div>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="app-screen" class="screen">
+        <div class="glass-panel app-container">
+            
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="user-profile">
+                    <img id="user-photo" src="" alt="Perfil" class="avatar">
+                    <div class="user-info">
+                        <span id="user-name" class="name">Usuario</span>
+                        <button id="btn-logout" class="btn-icon" title="Cerrar Sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <button id="btn-new-event" class="btn-primary hidden">
+                    <i class="fa-solid fa-plus"></i> Nuevo Evento
+                </button>
+                
+                <!-- Admin Only: Users Manager Button -->
+                <button id="btn-manage-users" class="btn-secondary hidden" style="width: 100%; margin-top: 0.5rem; justify-content: center;">
+                    <i class="fa-solid fa-users"></i> Gestionar Usuarios
+                </button>
+
+                <div class="sidebar-section">
+                    <h3 id="categories-header">Categorías <button id="btn-manage-categories" class="btn-icon small hidden"><i class="fa-solid fa-gear"></i></button></h3>
+                    <ul id="category-list" class="category-list">
+                        <!-- Categorías renderizadas dinámicamente -->
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="calendar-header">
+                    <div class="month-nav">
+                        <button id="btn-prev-month" class="btn-icon"><i class="fa-solid fa-chevron-left"></i></button>
+                        <h2 id="current-month-year">Cargando...</h2>
+                        <button id="btn-next-month" class="btn-icon"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <button id="btn-today" class="btn-secondary">Hoy</button>
+                </header>
+
+                <div class="calendar-grid">
+                    <div class="weekdays">
+                        <div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
+                    </div>
+                    <div id="calendar-days" class="days">
+                        <!-- Días renderizados dinámicamente -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo/Editar Evento -->
+    <div id="event-modal" class="modal-overlay hidden">
+        <div class="glass-panel modal">
+            <header class="modal-header">
+                <h3 id="event-modal-title">Nuevo Evento</h3>
+                <button id="btn-close-event-modal" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </header>
+            <form id="event-form" class="modal-form">
+                <input type="hidden" id="event-id">
+                <div class="form-group">
+                    <label for="event-title">Título</label>
+                    <input type="text" id="event-title" required placeholder="Añade un título">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-date">Fecha</label>
+                        <input type="date" id="event-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-category">Categoría</label>
+                        <select id="event-category" required>
+                            <!-- Opciones cargadas dinámicamente -->
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-time-start">Hora Inicio</label>
+                        <input type="time" id="event-time-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-time-end">Hora Fin</label>
+                        <input type="time" id="event-time-end" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="event-desc">Descripción (Opcional)</label>
+                    <textarea id="event-desc" rows="3" placeholder="Añade detalles del evento..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn-delete-event" class="btn-danger hidden">Eliminar</button>
+                    <div class="spacer"></div>
+                    <button type="button" class="btn-secondary cancel-btn">Cancelar</button>
+                    <button type="submit" id="btn-save-event" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Gestionar Categorías -->
+    <div id="category-modal" class="modal-overlay hidden">
+        <div class="glass-panel modal modal-sm">
+            <header class="modal-header">
+                <h3>Gestionar Categorías</h3>
+                <button id="btn-close-category-modal" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </header>
+            <div class="modal-body">
+                <form id="category-form" class="flex-form">
+                    <input type="text" id="new-category-name" placeholder="Nombre de categoría" required>
+                    <input type="color" id="new-category-color" value="#00f2fe">
+                    <button type="submit" class="btn-primary small"><i class="fa-solid fa-plus"></i></button>
+                </form>
+                <div class="manage-category-list" id="manage-category-list">
+                    <!-- Lista de categorías para gestionar -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gestionar Usuarios (ADMIN SOLO) -->
+    <div id="users-modal" class="modal-overlay hidden">
+        <div class="glass-panel modal">
+            <header class="modal-header">
+                <h3>Panel de Administración de Usuarios</h3>
+                <button id="btn-close-users-modal" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </header>
+            <div class="modal-body users-modal-body">
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-target="tab-pending">Solicitudes Pendientes <span id="pending-badge" class="badge">0</span></button>
+                    <button class="tab-btn" data-target="tab-active">Usuarios Aprobados</button>
+                </div>
+
+                <div class="tab-content active" id="tab-pending">
+                    <div id="pending-users-list" class="user-list">
+                        <!-- Usuarios pendientes -->
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-active">
+                    <div id="active-users-list" class="user-list">
+                        <!-- Usuarios aprobados -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Modular) -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="database.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
